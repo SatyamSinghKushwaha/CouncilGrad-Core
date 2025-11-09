@@ -1,29 +1,39 @@
 package com.councilGrad.CouncilGrad.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name = "students")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Student {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-    private Double marks10;
+    private Double tenthMarks;
+    private Double twelfthMarks;
+    private Double budget;
+    private String desiredCourse;
 
-    public Double getMarks12() {
-        return marks12;
+    public Double getBudget() {
+        return budget;
     }
 
-    public void setMarks12(Double marks12) {
-        this.marks12 = marks12;
+    public void setBudget(Double budget) {
+        this.budget = budget;
+    }
+
+    public String getDesiredCourse() {
+        return desiredCourse;
+    }
+
+    public void setDesiredCourse(String desiredCourse) {
+        this.desiredCourse = desiredCourse;
     }
 
     public Long getId() {
@@ -42,41 +52,32 @@ public class Student {
         this.name = name;
     }
 
-    public Double getMarks10() {
-        return marks10;
+    public Double getTenthMarks() {
+        return tenthMarks;
     }
 
-    public void setMarks10(Double marks10) {
-        this.marks10 = marks10;
+    public void setTenthMarks(Double tenthMarks) {
+        this.tenthMarks = tenthMarks;
     }
 
-    public String getCategory() {
-        return category;
+    public Double getTwelfthMarks() {
+        return twelfthMarks;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setTwelfthMarks(Double twelfthMarks) {
+        this.twelfthMarks = twelfthMarks;
     }
 
-    public Integer getBudget() {
-        return budget;
+    @Override
+    public String toString() {
+        return "Student{" +
+                "budget=" + budget +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", tenthMarks=" + tenthMarks +
+                ", twelfthMarks=" + twelfthMarks +
+                ", desiredCourse='" + desiredCourse + '\'' +
+                '}';
     }
-
-    public void setBudget(Integer budget) {
-        this.budget = budget;
-    }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
-    }
-
-    private Double marks12;
-    private String category;
-    private Integer budget;
-    private String course;
 }
 

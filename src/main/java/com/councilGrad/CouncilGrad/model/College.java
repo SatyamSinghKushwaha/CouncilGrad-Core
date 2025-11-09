@@ -1,41 +1,32 @@
 package com.councilGrad.CouncilGrad.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name = "college_eligibility")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class College {
-    public College() {
-    }
-
-    public College(Long id, String collegeName, Double minMarks10, Double minMarks12, String category, String course, Integer fees) {
-        this.id = id;
-        this.collegeName = collegeName;
-        this.minMarks10 = minMarks10;
-        this.minMarks12 = minMarks12;
-        this.category = category;
-        this.course = course;
-        this.fees = fees;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String collegeName;
+    private String name;
+    private String location;
+    private String course;
+    private Double minTenthMarks;
+    private Double minTwelfthMarks;
+    private Double maxBudget;
 
-    public Double getMinMarks10() {
-        return minMarks10;
+    public String getCourse() {
+        return course;
     }
 
-    public void setMinMarks10(Double minMarks10) {
-        this.minMarks10 = minMarks10;
+    public void setCourse(String course) {
+        this.course = course;
     }
 
     public Long getId() {
@@ -46,50 +37,45 @@ public class College {
         this.id = id;
     }
 
-    public String getCollegeName() {
-        return collegeName;
+    public String getLocation() {
+        return location;
     }
 
-    public void setCollegeName(String collegeName) {
-        this.collegeName = collegeName;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public Double getMinMarks12() {
-        return minMarks12;
+    public Double getMaxBudget() {
+        return maxBudget;
     }
 
-    public void setMinMarks12(Double minMarks12) {
-        this.minMarks12 = minMarks12;
+    public void setMaxBudget(Double maxBudget) {
+        this.maxBudget = maxBudget;
     }
 
-    public String getCategory() {
-        return category;
+    public Double getMinTenthMarks() {
+        return minTenthMarks;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setMinTenthMarks(Double minTenthMarks) {
+        this.minTenthMarks = minTenthMarks;
     }
 
-    public String getCourse() {
-        return course;
+    public Double getMinTwelfthMarks() {
+        return minTwelfthMarks;
     }
 
-    public void setCourse(String course) {
-        this.course = course;
+    public void setMinTwelfthMarks(Double minTwelfthMarks) {
+        this.minTwelfthMarks = minTwelfthMarks;
     }
 
-    public Integer getFees() {
-        return fees;
+    public String getName() {
+        return name;
     }
 
-    public void setFees(Integer fees) {
-        this.fees = fees;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    private Double minMarks10;
-    private Double minMarks12;
-    private String category;
-    private String course;
-    private Integer fees;
 }
 
