@@ -47,10 +47,8 @@ public class StudentController {
     }
 
     // 🔍 Endpoint to get eligible colleges for a student
-    @GetMapping("/{id}/eligible-colleges")
-    public List<College> getEligibleColleges(@PathVariable Long id) {
-        Student student = studentService.getStudentById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+    @PostMapping("/eligible-colleges")
+    public List<College> getEligibleColleges(@RequestBody Student student) {
         return eligibilityService.findEligibleColleges(student);
     }
 }
