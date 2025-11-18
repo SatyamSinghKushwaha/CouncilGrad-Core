@@ -18,17 +18,6 @@ public class EligibilityService {
         this.collegeRepository = collegeRepository;
     }
 
-//    public List<College> findEligibleColleges(Student student) {
-//        return collegeRepository.findAll()
-//                .stream()
-//                .filter(c ->
-//                        c.getCourse().equalsIgnoreCase(student.getDesiredCourse()) &&
-//                                student.getTenthMarks() >= c.getMinTenthMarks() &&
-//                                student.getTwelfthMarks() >= c.getMinTwelfthMarks() &&
-//                                student.getBudget() <= c.getMaxBudget()
-//                )
-//                .collect(Collectors.toList());
-//    }
 public List<College> findEligibleColleges(Student student) {
     Specification<College> spec = Specification.where(null);
 

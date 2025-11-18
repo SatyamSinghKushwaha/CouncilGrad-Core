@@ -5,6 +5,7 @@ import com.councilGrad.CouncilGrad.model.Student;
 import com.councilGrad.CouncilGrad.service.StudentService;
 import com.councilGrad.CouncilGrad.service.EligibilityService;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,10 +47,10 @@ public class StudentController {
         studentService.deleteStudent(id);
     }
 
-    // 🔍 Endpoint to get eligible colleges for a student
     @PostMapping("/eligible-colleges")
-    public List<College> getEligibleColleges(@RequestBody Student student) {
-        return eligibilityService.findEligibleColleges(student);
+    public ResponseEntity<List<College>> getEligibleColleges(@RequestBody Student student) {
+        List<College> colleges = eligibilityService.findEligibleColleges(student);
+        return ResponseEntity.ok(colleges);
     }
 }
 
