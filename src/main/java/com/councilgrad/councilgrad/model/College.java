@@ -1,4 +1,4 @@
-package com.councilGrad.CouncilGrad.model;
+package com.councilgrad.councilgrad.model;
 
 import jakarta.persistence.*;
 import lombok.*;

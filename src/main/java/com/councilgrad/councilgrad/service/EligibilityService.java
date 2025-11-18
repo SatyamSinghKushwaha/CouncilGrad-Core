@@ -1,13 +1,12 @@
-package com.councilGrad.CouncilGrad.service;
+package com.councilgrad.councilgrad.service;
 
-import com.councilGrad.CouncilGrad.model.College;
-import com.councilGrad.CouncilGrad.model.Student;
-import com.councilGrad.CouncilGrad.repository.CollegeRepository;
+import com.councilgrad.councilgrad.model.College;
+import com.councilgrad.councilgrad.model.Student;
+import com.councilgrad.councilgrad.repository.CollegeRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class EligibilityService {

@@ -1,7 +1,7 @@
-package com.councilGrad.CouncilGrad.controller;
+package com.councilgrad.councilgrad.controller;
 
-import com.councilGrad.CouncilGrad.model.College;
-import com.councilGrad.CouncilGrad.service.CollegeService;
+import com.councilgrad.councilgrad.model.College;
+import com.councilgrad.councilgrad.service.CollegeService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

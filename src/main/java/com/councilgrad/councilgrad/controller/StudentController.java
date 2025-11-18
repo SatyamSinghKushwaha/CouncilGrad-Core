@@ -1,9 +1,9 @@
-package com.councilGrad.CouncilGrad.controller;
+package com.councilgrad.councilgrad.controller;
 
-import com.councilGrad.CouncilGrad.model.College;
-import com.councilGrad.CouncilGrad.model.Student;
-import com.councilGrad.CouncilGrad.service.StudentService;
-import com.councilGrad.CouncilGrad.service.EligibilityService;
+import com.councilgrad.councilgrad.model.College;
+import com.councilgrad.councilgrad.model.Student;
+import com.councilgrad.councilgrad.service.StudentService;
+import com.councilgrad.councilgrad.service.EligibilityService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

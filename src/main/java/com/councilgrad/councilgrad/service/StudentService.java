@@ -1,7 +1,7 @@
-package com.councilGrad.CouncilGrad.service;
+package com.councilgrad.councilgrad.service;
 
-import com.councilGrad.CouncilGrad.model.Student;
-import com.councilGrad.CouncilGrad.repository.StudentRepository;
+import com.councilgrad.councilgrad.model.Student;
+import com.councilgrad.councilgrad.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

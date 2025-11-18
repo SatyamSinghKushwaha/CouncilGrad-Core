@@ -1,6 +1,6 @@
-package com.councilGrad.CouncilGrad.repository;
+package com.councilgrad.councilgrad.repository;
 
-import com.councilGrad.CouncilGrad.model.College;
+import com.councilgrad.councilgrad.model.College;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
