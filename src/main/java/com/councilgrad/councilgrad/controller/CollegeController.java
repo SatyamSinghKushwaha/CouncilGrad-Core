@@ -1,5 +1,6 @@
 package com.councilgrad.councilgrad.controller;
 
+import com.councilgrad.councilgrad.dto.CollegeCourseDto;
 import com.councilgrad.councilgrad.model.College;
 import com.councilgrad.councilgrad.service.CollegeService;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,8 @@ public class CollegeController {
 
     @GetMapping("/{id}")
     public College getCollegeById(@PathVariable Long id) {
-        return collegeService.getCollegeById(id).orElseThrow(() -> new RuntimeException("College not found"));
+        return collegeService.getCollegeById(id)
+                .orElseThrow(() -> new RuntimeException("College not found"));
     }
 
     @PostMapping
@@ -40,5 +42,10 @@ public class CollegeController {
     public void deleteCollege(@PathVariable Long id) {
         collegeService.deleteCollege(id);
     }
-}
 
+    // NEW: all courses offered by a college
+    @GetMapping("/{id}/courses")
+    public List<CollegeCourseDto> getCoursesOfCollege(@PathVariable Long id) {
+        return collegeService.getCoursesForCollege(id);
+    }
+}

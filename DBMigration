@@ -1,0 +1,78 @@
+-- ================================
+-- PROGRAMS TABLE
+-- ================================
+CREATE TABLE programs (
+    id          BIGSERIAL PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT
+);
+
+-- ================================
+-- COURSES TABLE
+-- ================================
+CREATE TABLE courses (
+    id          BIGSERIAL PRIMARY KEY,
+    name        VARCHAR(150) NOT NULL,
+    level       VARCHAR(50),
+    program_id  BIGINT NOT NULL REFERENCES programs(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_courses_program ON courses(program_id);
+CREATE UNIQUE INDEX uq_course_program_name ON courses(program_id, lower(name));
+
+-- ================================
+-- SPECIALIZATIONS TABLE
+-- ================================
+CREATE TABLE specializations (
+    id        BIGSERIAL PRIMARY KEY,
+    name      VARCHAR(150) NOT NULL,
+    course_id BIGINT NOT NULL REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_specializations_course ON specializations(course_id);
+CREATE UNIQUE INDEX uq_spec_course_name ON specializations(course_id, lower(name));
+
+-- ================================
+-- COLLEGES TABLE
+-- ================================
+CREATE TABLE colleges (
+    id          BIGSERIAL PRIMARY KEY,
+    name        VARCHAR(200) NOT NULL,
+    location    VARCHAR(150),
+    website     VARCHAR(255),
+    description TEXT
+);
+
+CREATE UNIQUE INDEX uq_college_name_location ON colleges(lower(name), lower(location));
+
+-- ================================
+-- COLLEGE_COURSES TABLE
+-- ================================
+CREATE TABLE college_courses (
+    id             BIGSERIAL PRIMARY KEY,
+    college_id     BIGINT NOT NULL REFERENCES colleges(id) ON DELETE CASCADE,
+    course_id      BIGINT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    fee_per_year   NUMERIC(12,2),
+    duration_years INTEGER,
+    seats          INTEGER
+);
+
+CREATE INDEX idx_cc_college ON college_courses(college_id);
+CREATE INDEX idx_cc_course  ON college_courses(course_id);
+
+-- ================================
+-- ELIGIBILITY RULES TABLE
+-- ================================
+CREATE TABLE eligibility_rules (
+    id                  BIGSERIAL PRIMARY KEY,
+    college_course_id   BIGINT NOT NULL REFERENCES college_courses(id) ON DELETE CASCADE,
+    specialization_id   BIGINT REFERENCES specializations(id) ON DELETE SET NULL,
+    min_tenth_marks     NUMERIC(5,2),
+    min_twelfth_marks   NUMERIC(5,2),
+    max_budget_per_year NUMERIC(12,2),
+    required_exam       VARCHAR(100),
+    min_exam_score      NUMERIC(6,2)
+);
+
+CREATE INDEX idx_er_cc ON eligibility_rules(college_course_id);
+CREATE INDEX idx_er_spec ON eligibility_rules(specialization_id);

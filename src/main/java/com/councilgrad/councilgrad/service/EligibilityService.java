@@ -1,45 +1,105 @@
 package com.councilgrad.councilgrad.service;
 
-import com.councilgrad.councilgrad.model.College;
-import com.councilgrad.councilgrad.model.Student;
-import com.councilgrad.councilgrad.repository.CollegeRepository;
-import org.springframework.data.jpa.domain.Specification;
+import com.councilgrad.councilgrad.model.*;
+import com.councilgrad.councilgrad.repository.CollegeCourseRepository;
+import com.councilgrad.councilgrad.repository.CourseRepository;
+import com.councilgrad.councilgrad.repository.EligibilityRuleRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class EligibilityService {
 
-    private final CollegeRepository collegeRepository;
+    private final CourseRepository courseRepository;
+    private final CollegeCourseRepository collegeCourseRepository;
+    private final EligibilityRuleRepository eligibilityRuleRepository;
 
-    public EligibilityService(CollegeRepository collegeRepository) {
-        this.collegeRepository = collegeRepository;
-    }
-
-public List<College> findEligibleColleges(Student student) {
-    Specification<College> spec = Specification.where(null);
-
-    if (student.getDesiredCourse() != null) {
-        spec = spec.and((root, query, cb) ->
-                cb.equal(cb.lower(root.get("course")), student.getDesiredCourse().toLowerCase()));
-    }
-    if (student.getTenthMarks() != null) {
-        spec = spec.and((root, query, cb) ->
-                cb.lessThanOrEqualTo(root.get("minTenthMarks"), student.getTenthMarks()));
-    }
-    if (student.getTwelfthMarks() != null) {
-        spec = spec.and((root, query, cb) ->
-                cb.lessThanOrEqualTo(root.get("minTwelfthMarks"), student.getTwelfthMarks()));
-    }
-    if (student.getBudget() != null) {
-        spec = spec.and((root, query, cb) ->
-                cb.greaterThanOrEqualTo(root.get("maxBudget"), student.getBudget()));
+    public EligibilityService(CourseRepository courseRepository,
+                              CollegeCourseRepository collegeCourseRepository,
+                              EligibilityRuleRepository eligibilityRuleRepository) {
+        this.courseRepository = courseRepository;
+        this.collegeCourseRepository = collegeCourseRepository;
+        this.eligibilityRuleRepository = eligibilityRuleRepository;
     }
 
-    return collegeRepository.findAll(spec);
+    public List<College> findEligibleColleges(Student student) {
+
+        // 1) Find courses matching desiredCourse (by name, case-insensitive)
+        List<Course> matchingCourses = courseRepository
+                .findByNameIgnoreCase(student.getDesiredCourse());
+
+        if (matchingCourses.isEmpty()) {
+            return List.of();
+        }
+
+        Set<Long> courseIds = matchingCourses.stream()
+                .map(Course::getId)
+                .collect(Collectors.toSet());
+
+        // 2) Get all college_course entries for these courses
+        List<CollegeCourse> ccList = collegeCourseRepository.findAll()
+                .stream()
+                .filter(cc -> courseIds.contains(cc.getCourse().getId()))
+                .collect(Collectors.toList());
+
+        if (ccList.isEmpty()) {
+            return List.of();
+        }
+
+        // 3) For each college_course, check eligibility
+        Double tenth = student.getTenthMarks();
+        Double twelfth = student.getTwelfthMarks();
+        Double budget = student.getBudget();
+
+        Map<Long, College> eligibleColleges = new LinkedHashMap<>();
+
+        for (CollegeCourse cc : ccList) {
+            // basic budget filter (optional if feePerYear null)
+            if (budget != null && cc.getFeePerYear() != null &&
+                    cc.getFeePerYear() > budget) {
+                continue;
+            }
+
+            List<EligibilityRule> rules =
+                    eligibilityRuleRepository.findByCollegeCourseId(cc.getId());
+
+            if (rules.isEmpty()) {
+                // If no specific rule, we can still consider it if fee matches
+                eligibleColleges.putIfAbsent(cc.getCollege().getId(), cc.getCollege());
+                continue;
+            }
+
+            for (EligibilityRule rule : rules) {
+                boolean ok = true;
+
+                if (tenth != null && rule.getMinTenthMarks() != null &&
+                        tenth < rule.getMinTenthMarks()) {
+                    ok = false;
+                }
+
+                if (twelfth != null && rule.getMinTwelfthMarks() != null &&
+                        twelfth < rule.getMinTwelfthMarks()) {
+                    ok = false;
+                }
+
+                if (budget != null) {
+                    Double effectiveMax =
+                            rule.getMaxBudgetPerYear() != null ? rule.getMaxBudgetPerYear()
+                                    : cc.getFeePerYear();
+                    if (effectiveMax != null && effectiveMax > budget) {
+                        ok = false;
+                    }
+                }
+
+                if (ok) {
+                    eligibleColleges.putIfAbsent(cc.getCollege().getId(), cc.getCollege());
+                    break;
+                }
+            }
+        }
+
+        return new ArrayList<>(eligibleColleges.values());
+    }
 }
-
-}
-
-

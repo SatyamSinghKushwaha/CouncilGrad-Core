@@ -6,29 +6,24 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "colleges")
+@Table(name = "programs")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class College {
+public class Program {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    private String location;
-
-    private String website;
-
-    @Column(length = 1000)
     private String description;
 
-    @OneToMany(mappedBy = "college", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<CollegeCourse> collegeCourses;
+    private List<Course> courses;
 }
