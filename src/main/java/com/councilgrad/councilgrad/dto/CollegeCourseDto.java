@@ -1,17 +1,17 @@
 package com.councilgrad.councilgrad.dto;
 
-import lombok.*;
+import com.councilgrad.councilgrad.model.enums.CourseType;
+import com.councilgrad.councilgrad.model.enums.ProgramType;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class CollegeCourseDto {
-
     private Long collegeCourseId;
     private Long courseId;
-    private String programName;
-    private String courseName;
+    private ProgramType programName;
+    private CourseType courseName;
     private Double feePerYear;
     private Integer durationYears;
 }

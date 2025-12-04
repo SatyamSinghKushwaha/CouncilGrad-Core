@@ -1,6 +1,7 @@
 package com.councilgrad.councilgrad.service;
 
 import com.councilgrad.councilgrad.model.*;
+import com.councilgrad.councilgrad.model.enums.CourseType;
 import com.councilgrad.councilgrad.repository.CollegeCourseRepository;
 import com.councilgrad.councilgrad.repository.CourseRepository;
 import com.councilgrad.councilgrad.repository.EligibilityRuleRepository;
@@ -26,9 +27,16 @@ public class EligibilityService {
 
     public List<College> findEligibleColleges(Student student) {
 
-        // 1) Find courses matching desiredCourse (by name, case-insensitive)
-        List<Course> matchingCourses = courseRepository
-                .findByNameIgnoreCase(student.getDesiredCourse());
+        // 1️⃣ Convert UI string → ENUM
+        CourseType desiredType;
+        try {
+            desiredType = CourseType.valueOf(student.getDesiredCourse());
+        } catch (Exception e) {
+            return List.of(); // Invalid course sent
+        }
+
+        // 2️⃣ Now fetch courses by enum name (no ignore case needed)
+        List<Course> matchingCourses = courseRepository.findByName(desiredType);
 
         if (matchingCourses.isEmpty()) {
             return List.of();
@@ -38,7 +46,7 @@ public class EligibilityService {
                 .map(Course::getId)
                 .collect(Collectors.toSet());
 
-        // 2) Get all college_course entries for these courses
+        // 3️⃣ Fetch college_course rows for these courseIds
         List<CollegeCourse> ccList = collegeCourseRepository.findAll()
                 .stream()
                 .filter(cc -> courseIds.contains(cc.getCourse().getId()))
@@ -48,15 +56,14 @@ public class EligibilityService {
             return List.of();
         }
 
-        // 3) For each college_course, check eligibility
         Double tenth = student.getTenthMarks();
         Double twelfth = student.getTwelfthMarks();
         Double budget = student.getBudget();
 
-        Map<Long, College> eligibleColleges = new LinkedHashMap<>();
+        Map<Long, College> eligible = new LinkedHashMap<>();
 
         for (CollegeCourse cc : ccList) {
-            // basic budget filter (optional if feePerYear null)
+
             if (budget != null && cc.getFeePerYear() != null &&
                     cc.getFeePerYear() > budget) {
                 continue;
@@ -66,8 +73,7 @@ public class EligibilityService {
                     eligibilityRuleRepository.findByCollegeCourseId(cc.getId());
 
             if (rules.isEmpty()) {
-                // If no specific rule, we can still consider it if fee matches
-                eligibleColleges.putIfAbsent(cc.getCollege().getId(), cc.getCollege());
+                eligible.putIfAbsent(cc.getCollege().getId(), cc.getCollege());
                 continue;
             }
 
@@ -75,31 +81,27 @@ public class EligibilityService {
                 boolean ok = true;
 
                 if (tenth != null && rule.getMinTenthMarks() != null &&
-                        tenth < rule.getMinTenthMarks()) {
-                    ok = false;
-                }
+                        tenth < rule.getMinTenthMarks()) ok = false;
 
                 if (twelfth != null && rule.getMinTwelfthMarks() != null &&
-                        twelfth < rule.getMinTwelfthMarks()) {
-                    ok = false;
-                }
+                        twelfth < rule.getMinTwelfthMarks()) ok = false;
 
                 if (budget != null) {
-                    Double effectiveMax =
-                            rule.getMaxBudgetPerYear() != null ? rule.getMaxBudgetPerYear()
-                                    : cc.getFeePerYear();
-                    if (effectiveMax != null && effectiveMax > budget) {
-                        ok = false;
-                    }
+                    Double effectiveMax = rule.getMaxBudgetPerYear() != null
+                            ? rule.getMaxBudgetPerYear()
+                            : cc.getFeePerYear();
+
+                    if (effectiveMax != null && effectiveMax > budget) ok = false;
                 }
 
                 if (ok) {
-                    eligibleColleges.putIfAbsent(cc.getCollege().getId(), cc.getCollege());
+                    eligible.putIfAbsent(cc.getCollege().getId(), cc.getCollege());
                     break;
                 }
             }
         }
 
-        return new ArrayList<>(eligibleColleges.values());
+        return new ArrayList<>(eligible.values());
     }
+
 }

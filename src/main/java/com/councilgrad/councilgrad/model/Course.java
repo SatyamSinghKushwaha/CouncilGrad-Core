@@ -1,8 +1,10 @@
 package com.councilgrad.councilgrad.model;
 
+import com.councilgrad.councilgrad.model.enums.CourseType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,10 +19,12 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 150)
-    private String name;
+    // enum in "name" column
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name", nullable = false)
+    private CourseType name;
 
-    // Optional: UG / PG / Diploma etc
+    // optional: UG/PG etc, keep as string for now
     private String level;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,13 +32,8 @@ public class Course {
     @ToString.Exclude
     private Program program;
 
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = false)
+    @Builder.Default
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Specialization> specializations;
-
-    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<CollegeCourse> collegeCourses;
+    private List<Specialization> specializations = new ArrayList<>();
 }

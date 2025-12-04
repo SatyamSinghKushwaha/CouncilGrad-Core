@@ -1,11 +1,8 @@
 package com.councilgrad.councilgrad.controller;
 
-import com.councilgrad.councilgrad.dto.CourseCollegeDto;
-import com.councilgrad.councilgrad.dto.SpecializationDto;
+import com.councilgrad.councilgrad.dto.CreateCourseRequest;
 import com.councilgrad.councilgrad.model.Course;
-import com.councilgrad.councilgrad.service.CollegeService;
 import com.councilgrad.councilgrad.service.CourseService;
-import com.councilgrad.councilgrad.service.SpecializationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,33 +11,40 @@ import java.util.List;
 @RequestMapping("/api/courses")
 public class CourseController {
 
-    private final CourseService courseService;
-    private final CollegeService collegeService;
-    private final SpecializationService specializationService;
+    private final CourseService service;
 
-    public CourseController(CourseService courseService,
-                            CollegeService collegeService,
-                            SpecializationService specializationService) {
-        this.courseService = courseService;
-        this.collegeService = collegeService;
-        this.specializationService = specializationService;
+    public CourseController(CourseService service) {
+        this.service = service;
     }
 
     @GetMapping
-    public List<Course> getCourses(@RequestParam(value = "programId", required = false) Long programId) {
-        if (programId != null) {
-            return courseService.getCoursesByProgram(programId);
-        }
-        return courseService.getAllCourses();
+    public List<Course> list(@RequestParam(value = "programId", required = false) Long programId) {
+        if (programId != null) return service.getByProgram(programId);
+        return service.getAll();
     }
 
-    @GetMapping("/{courseId}/colleges")
-    public List<CourseCollegeDto> getCollegesForCourse(@PathVariable Long courseId) {
-        return collegeService.getCollegesForCourse(courseId);
+    @GetMapping("/{id}")
+    public Course get(@PathVariable Long id) {
+        return service.getAll().stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Course not found"));
     }
 
-    @GetMapping("/{courseId}/specializations")
-    public List<SpecializationDto> getSpecializationsForCourse(@PathVariable Long courseId) {
-        return specializationService.getByCourse(courseId);
+    @PostMapping
+    public Course create(@RequestBody CreateCourseRequest req) {
+        Course c = Course.builder().name(req.getName()).level(req.getLevel()).build();
+        return service.create(c, req.getProgramId());
+    }
+
+    @PutMapping("/{id}")
+    public Course update(@PathVariable Long id, @RequestBody CreateCourseRequest req) {
+        Course c = Course.builder().name(req.getName()).level(req.getLevel()).build();
+        return service.update(id, c);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 }

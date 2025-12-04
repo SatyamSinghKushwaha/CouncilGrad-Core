@@ -1,8 +1,10 @@
 package com.councilgrad.councilgrad.model;
 
+import com.councilgrad.councilgrad.model.enums.ProgramType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,13 +19,15 @@ public class Program {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String name;
+    // use enum, stored as VARCHAR in "name" column
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name", nullable = false, unique = true)
+    private ProgramType name;
 
     private String description;
 
-    @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = false)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Course> courses;
+    @Builder.Default
+    private List<Course> courses = new ArrayList<>();
 }
